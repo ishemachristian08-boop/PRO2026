@@ -1,0 +1,105 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom styles for NCA website */
+@layer base {
+  html {
+    font-family: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Montserrat', system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, sans-serif;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-primary-500 hover:bg-primary-600 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-nca hover:shadow-nca-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
+  }
+  
+  .btn-secondary {
+    @apply bg-gold-400 hover:bg-gold-500 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 shadow-nca hover:shadow-nca-lg focus:outline-none focus:ring-2 focus:ring-gold-400 focus:ring-offset-2;
+  }
+  
+  .btn-outline {
+    @apply border-2 border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
+  }
+  
+  .card {
+    @apply bg-white rounded-xl shadow-nca hover:shadow-nca-lg transition-all duration-300 transform hover:-translate-y-1;
+  }
+  
+  .section-title {
+    @apply text-3xl md:text-4xl font-bold text-primary-900 mb-6 text-center;
+  }
+  
+  .section-subtitle {
+    @apply text-lg md:text-xl text-gray-600 mb-8 text-center max-w-3xl mx-auto;
+  }
+  
+  .feature-card {
+    @apply p-6 rounded-xl border border-gray-100 hover:border-primary-200 transition-all duration-300;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    background: linear-gradient(135deg, #0052cc 0%, #ffb800 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .glass {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  
+  .hero-pattern {
+    background-image: radial-gradient(circle at 25% 25%, rgba(0, 82, 204, 0.1) 0%, transparent 50%),
+                      radial-gradient(circle at 75% 75%, rgba(255, 184, 0, 0.1) 0%, transparent 50%);
+  }
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Animation for hero section */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+.float {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .section-title {
+    @apply text-2xl md:text-3xl;
+  }
+  
+  .section-subtitle {
+    @apply text-base md:text-lg;
+  }
+}

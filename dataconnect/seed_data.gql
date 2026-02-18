@@ -1,0 +1,120 @@
+mutation CreateDemoData @transaction @auth(level: USER, insecureReason: "Seed data mutations are typically run by an administrator, but for demonstration purposes, it's open to any logged-in user.") {
+  user_insertMany(data: [
+    {
+      id: "a1a1a1a1-a1a1-a1a1-a1a1-a1a1a1a1a1a1",
+      displayName: "Teacher One",
+      email: "teacher1@example.com",
+      userType: "Teacher",
+      createdAt: "2023-01-01T10:00:00Z"
+    },
+    {
+      id: "b2b2b2b2-b2b2-b2b2-b2b2-b2b2b2b2b2b2",
+      displayName: "Student Alpha",
+      email: "studentA@example.com",
+      userType: "Student",
+      createdAt: "2023-01-01T10:05:00Z"
+    },
+    {
+      id: "c3c3c3c3-c3c3-c3c3-c3c3-c3c3c3c3c3c3",
+      displayName: "Student Beta",
+      email: "studentB@example.com",
+      userType: "Student",
+      createdAt: "2023-01-01T10:10:00Z"
+    }
+  ])
+  course_insertMany(data: [
+    {
+      id: "d4d4d4d4-d4d4-d4d4-d4d4-d4d4d4d4d4d4",
+      teacherId: "a1a1a1a1-a1a1-a1a1-a1a1-a1a1a1a1a1a1",
+      courseCode: "MATH101",
+      name: "Introduction to Algebra",
+      gradeLevel: 9,
+      createdAt: "2023-01-05T09:00:00Z",
+      description: "A foundational course in algebra."
+    },
+    {
+      id: "e5e5e5e5-e5e5-e5e5-e5e5-e5e5e5e5e5e5",
+      teacherId: "a1a1a1a1-a1a1-a1a1-a1a1-a1a1a1a1a1a1",
+      courseCode: "SCI201",
+      name: "Biology Basics",
+      gradeLevel: 10,
+      createdAt: "2023-01-05T09:15:00Z",
+      description: "An introductory course to biological sciences."
+    }
+  ])
+  enrollment_insertMany(data: [
+    {
+      studentId: "b2b2b2b2-b2b2-b2b2-b2b2-b2b2b2b2b2b2",
+      courseId: "d4d4d4d4-d4d4-d4d4-d4d4-d4d4d4d4d4d4",
+      createdAt: "2023-01-10T08:00:00Z"
+    },
+    {
+      studentId: "c3c3c3c3-c3c3-c3c3-c3c3-c3c3c3c3c3c3",
+      courseId: "d4d4d4d4-d4d4-d4d4-d4d4-d4d4d4d4d4d4",
+      createdAt: "2023-01-10T08:05:00Z"
+    },
+    {
+      studentId: "b2b2b2b2-b2b2-b2b2-b2b2-b2b2b2b2b2b2",
+      courseId: "e5e5e5e5-e5e5-e5e5-e5e5-e5e5e5e5e5e5",
+      createdAt: "2023-01-10T08:10:00Z"
+    }
+  ])
+  assignment_insertMany(data: [
+    {
+      id: "f6f6f6f6-f6f6-f6f6-f6f6-f6f6f6f6f6f6",
+      courseId: "d4d4d4d4-d4d4-d4d4-d4d4-d4d4d4d4d4d4",
+      title: "Algebra Homework 1",
+      dueDate: "2023-02-01T23:59:59Z",
+      maxPoints: 100,
+      createdAt: "2023-01-15T12:00:00Z",
+      description: "Complete exercises from Chapter 1."
+    },
+    {
+      id: "g7g7g7g7-g7g7-g7g7-g7g7-g7g7g7g7g7g7",
+      courseId: "e5e5e5e5-e5e5-e5e5-e5e5-e5e5e5e5e5e5",
+      title: "Biology Lab Report",
+      dueDate: "2023-02-15T23:59:59Z",
+      maxPoints: 100,
+      createdAt: "2023-01-20T10:00:00Z",
+      description: "Write a report on cell structure."
+    }
+  ])
+  submission_insertMany(data: [
+    {
+      id: "h8h8h8h8-h8h8-h8h8-h8h8-h8h8h8h8h8h8",
+      assignmentId: "f6f6f6f6-f6f6-f6f6-f6f6-f6f6f6f6f6f6",
+      studentId: "b2b2b2b2-b2b2-b2b2-b2b2-b2b2b2b2b2b2",
+      submissionDate: "2023-01-30T18:00:00Z",
+      grade: 95.0,
+      createdAt: "2023-01-30T18:00:00Z",
+      submissionUrl: "https://example.com/submission/algebra1_alpha"
+    },
+    {
+      id: "i9i9i9i9-i9i9-i9i9-i9i9-i9i9i9i9i9i9",
+      assignmentId: "f6f6f6f6-f6f6-f6f6-f6f6-f6f6f6f6f6f6",
+      studentId: "c3c3c3c3-c3c3-c3c3-c3c3-c3c3c3c3c3c3",
+      submissionDate: "2023-01-31T20:00:00Z",
+      grade: 88.0,
+      createdAt: "2023-01-31T20:00:00Z",
+      submissionUrl: "https://example.com/submission/algebra1_beta"
+    }
+  ])
+  announcement_insertMany(data: [
+    {
+      id: "j0j0j0j0-j0j0-j0j0-j0j0-j0j0j0j0j0j0",
+      authorId: "a1a1a1a1-a1a1-a1a1-a1a1-a1a1a1a1a1a1",
+      title: "Welcome to the new semester!",
+      content: "Excited for a great semester ahead.",
+      targetAudience: "All",
+      createdAt: "2023-01-02T09:00:00Z"
+    },
+    {
+      id: "k1k1k1k1-k1k1-k1k1-k1k1-k1k1k1k1k1k1",
+      authorId: "a1a1a1a1-a1a1-a1a1-a1a1-a1a1a1a1a1a1",
+      title: "Algebra Exam Reminder",
+      content: "Don't forget the algebra exam is next week!",
+      targetAudience: "MATH101 Students",
+      createdAt: "2023-01-25T14:00:00Z"
+    }
+  ])
+}

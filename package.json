@@ -1,0 +1,43 @@
+{
+  "name": "nca-website",
+  "version": "1.0.0",
+  "description": "NYABIHU CHRISTIAN ACADEMY Website - Full-stack school management system",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"cd backend && npm run dev\" \"cd frontend && npm run dev\"",
+    "build": "cd frontend && npm run build",
+    "start": "cd frontend && npm start",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "lint": "cd frontend && npm run lint",
+    "test": "echo \"No test specified yet\"",
+    "setup": "npm run install:all"
+  },
+  "keywords": [
+    "school",
+    "education",
+    "christian",
+    "academy",
+    "nyabihu",
+    "rwanda",
+    "nextjs",
+    "nodejs",
+    "mongodb"
+  ],
+  "author": "NYABIHU CHRISTIAN ACADEMY",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nca-rwanda/nca-website.git"
+  },
+  "bugs": {
+    "url": "https://github.com/nca-rwanda/nca-website/issues"
+  },
+  "homepage": "https://github.com/nca-rwanda/nca-website#readme"
+}

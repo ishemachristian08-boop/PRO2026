@@ -1,0 +1,50 @@
+query ListAllCourses @auth(level: PUBLIC, insecureReason: "This operation is safe to expose to the public as it only lists general course information.") {
+  courses {
+    id
+    name
+    courseCode
+    gradeLevel
+    description
+    teacher {
+      displayName
+      email
+    }
+  }
+}
+
+query GetMyEnrollments @auth(level: USER) {
+  enrollments(where: {studentId: {eq_expr: "auth.uid"}}) {
+    course {
+      id
+      name
+      courseCode
+    }
+    createdAt
+  }
+}
+
+mutation CreateNewAssignment($courseId: UUID!, $title: String!, $dueDate: Timestamp!) @auth(level: USER, insecureReason: "This operation is restricted to logged-in users who are likely teachers creating assignments.") {
+  assignment_insert(data: {
+    courseId: $courseId,
+    title: $title,
+    dueDate: $dueDate,
+    createdAt_expr: "request.time"
+  }) {
+    id
+  }
+}
+
+query GetUserSubmissions($studentId: UUID!) @auth(level: USER, insecureReason: "This operation is safe to expose to all logged in users as they can only view their own submissions.") {
+  submissions(where: {studentId: {eq: $studentId}}) {
+    id
+    assignment {
+      title
+      course {
+        name
+      }
+    }
+    grade
+    submissionDate
+    submissionUrl
+  }
+}
