@@ -63,6 +63,17 @@ const userSchema = new mongoose.Schema({
   },
   resetPasswordToken: String,
   resetPasswordExpire: Date,
+  securityCode: {
+    type: String,
+    select: false
+  },
+  securityCodeAttempts: {
+    type: Number,
+    default: 0
+  },
+  securityCodeLockedUntil: {
+    type: Date
+  },
   createdAt: {
     type: Date,
     default: Date.now
@@ -91,6 +102,22 @@ userSchema.pre('save', async function(next) {
 // Instance method to check password
 userSchema.methods.comparePassword = async function(candidatePassword) {
   return await bcrypt.compare(candidatePassword, this.password);
+};
+
+// Instance method to check security code
+userSchema.methods.compareSecurityCode = async function(candidateCode) {
+  if (!this.securityCode) return true; // No security code set, allow login
+  return await bcrypt.compare(candidateCode, this.securityCode);
+};
+
+// Instance method to hash and set security code
+userSchema.methods.setSecurityCode = async function(code) {
+  if (!code) {
+    this.securityCode = undefined;
+    return;
+  }
+  const salt = await bcrypt.genSalt(10);
+  this.securityCode = await bcrypt.hash(code, salt);
 };
 
 // Instance method to generate reset token

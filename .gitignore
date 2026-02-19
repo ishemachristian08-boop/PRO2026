@@ -1,3 +1,46 @@
+# Node modules
+node_modules/
+
+# Next.js build output
+.next/
+out/
+build/
+dist/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime files
+pids/
+*.pid
+
+# dotenv
+.env
+.env.*.local
+
+# Editor directories and files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# OS files
+.DS_Store
+
+# Test coverage
+coverage/
+
+# Firebase
+firebase-debug.log
+
+# Misc
+*.pem
 # Logs
 logs
 *.log

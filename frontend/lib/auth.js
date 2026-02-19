@@ -36,20 +36,47 @@ export function AuthProvider({ children }) {
   }
 
   // Login function
-  const login = async (email, password) => {
+  const login = async (email, password, securityCode = null) => {
+    // Demo mode: Allow login without backend
+    const DEMO_MODE = true
+    
+    if (DEMO_MODE) {
+      // Demo credentials for testing
+      const demoUsers = {
+        'admin@nca.rw': { id: '1', email: 'admin@nca.rw', role: 'admin', profile: { firstName: 'Admin', lastName: 'User' }, token: 'demo-token' },
+        'teacher@nca.rw': { id: '2', email: 'teacher@nca.rw', role: 'teacher', profile: { firstName: 'John', lastName: 'Teacher' }, token: 'demo-token' },
+        'parent@nca.rw': { id: '3', email: 'parent@nca.rw', role: 'parent', profile: { firstName: 'Jane', lastName: 'Parent' }, token: 'demo-token' },
+      }
+      
+      const user = demoUsers[email.toLowerCase()]
+      
+      if (user && password === 'password123') {
+        // Check security code if required (for demo, accept any 4+ digit code or skip)
+        if (user.role === 'admin' && (!securityCode || securityCode.length < 4)) {
+          return { success: false, message: 'Security code is required for admin login', requiresSecurityCode: true }
+        }
+        
+        localStorage.setItem('token', user.token)
+        setUser(user)
+        return { success: true, data: user }
+      }
+      
+      return { success: false, message: 'Invalid credentials. Try admin@nca.rw / password123' }
+    }
+    
     try {
       setLoading(true)
       setError(null)
       
-      const response = await apiClient.auth.login(email, password)
+      const response = await apiClient.auth.login(email, password, securityCode)
       
       if (response.success) {
         localStorage.setItem('token', response.data.token)
         setUser(response.data)
-        return { success: true }
+        return { success: true, data: response.data }
       }
       
-      return { success: false, message: response.message }
+      return { success: false, message: response.message, requiresSecurityCode: response.requiresSecurityCode }
     } catch (error) {
       const errorMessage = error.message || 'Login failed'
       setError(errorMessage)

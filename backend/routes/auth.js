@@ -78,15 +78,24 @@ router.post('/register', validateRegistration, async (req, res) => {
 // @access  Public
 router.post('/login', validateLogin, async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, securityCode } = req.body;
 
     // Check for user email
-    const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
+    const user = await User.findOne({ email: email.toLowerCase() }).select('+password +securityCode');
 
     if (!user) {
       return res.status(401).json({
         success: false,
         message: 'Invalid credentials'
+      });
+    }
+
+    // Check if account is locked due to too many failed attempts
+    if (user.securityCodeLockedUntil && user.securityCodeLockedUntil > new Date()) {
+      const minutesLeft = Math.ceil((user.securityCodeLockedUntil - new Date()) / 60000);
+      return res.status(429).json({
+        success: false,
+        message: `Account is temporarily locked. Please try again in ${minutesLeft} minutes.`
       });
     }
 
@@ -102,10 +111,54 @@ router.post('/login', validateLogin, async (req, res) => {
     const isMatch = await user.comparePassword(password);
 
     if (!isMatch) {
+      // Reset security code attempts on successful password
+      user.securityCodeAttempts = 0;
+      await user.save();
+      
       return res.status(401).json({
         success: false,
         message: 'Invalid credentials'
       });
+    }
+
+    // Check security code if it's set for the user
+    if (user.securityCode) {
+      if (!securityCode) {
+        return res.status(401).json({
+          success: false,
+          message: 'Security code is required',
+          requiresSecurityCode: true
+        });
+      }
+
+      const isSecurityCodeValid = await user.compareSecurityCode(securityCode);
+      
+      if (!isSecurityCodeValid) {
+        // Increment failed attempts
+        user.securityCodeAttempts = (user.securityCodeAttempts || 0) + 1;
+        
+        // Lock account after 5 failed attempts
+        if (user.securityCodeAttempts >= 5) {
+          user.securityCodeLockedUntil = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+          await user.save();
+          return res.status(429).json({
+            success: false,
+            message: 'Too many failed attempts. Account locked for 15 minutes.'
+          });
+        }
+        
+        await user.save();
+        return res.status(401).json({
+          success: false,
+          message: `Invalid security code. ${5 - user.securityCodeAttempts} attempts remaining.`,
+          requiresSecurityCode: true
+        });
+      }
+
+      // Reset attempts on successful security code
+      user.securityCodeAttempts = 0;
+      user.securityCodeLockedUntil = undefined;
+      await user.save();
     }
 
     // Update last login
@@ -357,6 +410,104 @@ router.put('/reset-password/:resettoken', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Server error during password reset'
+    });
+  }
+});
+
+// @desc    Set security code
+// @route   POST /api/auth/security-code
+// @access  Private
+router.post('/security-code', protect, async (req, res) => {
+  try {
+    const { securityCode, currentPassword } = req.body;
+
+    if (!securityCode || securityCode.length < 4) {
+      return res.status(400).json({
+        success: false,
+        message: 'Security code must be at least 4 characters'
+      });
+    }
+
+    const user = await User.findById(req.user._id).select('+password');
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    // Verify current password before setting security code
+    if (currentPassword) {
+      const isMatch = await user.comparePassword(currentPassword);
+      if (!isMatch) {
+        return res.status(400).json({
+          success: false,
+          message: 'Current password is incorrect'
+        });
+      }
+    }
+
+    // Set the security code
+    await user.setSecurityCode(securityCode);
+    await user.save();
+
+    res.json({
+      success: true,
+      message: 'Security code set successfully'
+    });
+
+  } catch (error) {
+    console.error('Set security code error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error setting security code'
+    });
+  }
+});
+
+// @desc    Remove security code
+// @route   DELETE /api/auth/security-code
+// @access  Private
+router.delete('/security-code', protect, async (req, res) => {
+  try {
+    const { currentPassword } = req.body;
+
+    const user = await User.findById(req.user._id).select('+password');
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    // Verify current password before removing security code
+    if (currentPassword) {
+      const isMatch = await user.comparePassword(currentPassword);
+      if (!isMatch) {
+        return res.status(400).json({
+          success: false,
+          message: 'Current password is incorrect'
+        });
+      }
+    }
+
+    user.securityCode = undefined;
+    user.securityCodeAttempts = 0;
+    user.securityCodeLockedUntil = undefined;
+    await user.save();
+
+    res.json({
+      success: true,
+      message: 'Security code removed successfully'
+    });
+
+  } catch (error) {
+    console.error('Remove security code error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error removing security code'
     });
   }
 });

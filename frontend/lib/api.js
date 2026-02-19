@@ -52,9 +52,24 @@ async function request(endpoint, options = {}) {
     return await response.json()
   } catch (error) {
     if (error instanceof ApiError) {
+      // Provide more user-friendly error messages
+      if (error.status === 0) {
+        throw new ApiError(
+          'Unable to connect to server. Please ensure the backend is running.',
+          0,
+          { originalError: error }
+        )
+      }
+      if (error.status === 500) {
+        throw new ApiError(
+          'Server error. Please try again later or contact support.',
+          error.status,
+          error.data
+        )
+      }
       throw error
     }
-    throw new ApiError('Network error occurred', 0, { originalError: error })
+    throw new ApiError('Network error occurred. Please check your connection.', 0, { originalError: error })
   }
 }
 
@@ -64,10 +79,10 @@ const apiClient = {
 
   // Authentication methods
   auth: {
-    async login(email, password) {
+    async login(email, password, securityCode = null) {
       return request('/auth/login', {
         method: 'POST',
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, securityCode }),
         includeAuth: false,
       })
     },
@@ -101,6 +116,20 @@ const apiClient = {
       return request('/auth/password', {
         method: 'PUT',
         body: JSON.stringify(passwordData),
+      })
+    },
+
+    async setSecurityCode(securityCode, currentPassword) {
+      return request('/auth/security-code', {
+        method: 'POST',
+        body: JSON.stringify({ securityCode, currentPassword }),
+      })
+    },
+
+    async removeSecurityCode(currentPassword) {
+      return request('/auth/security-code', {
+        method: 'DELETE',
+        body: JSON.stringify({ currentPassword }),
       })
     },
   },

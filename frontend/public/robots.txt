@@ -1,0 +1,28 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+
+# Disallow admin and portal pages from indexing
+Disallow: /admin/
+Disallow: /staff-portal/
+Disallow: /student-portal/
+
+# Sitemap
+Sitemap: https://nca.rw/sitemap.xml
+
+# Crawl-delay (optional - use if server is slow)
+Crawl-delay: 1
+
+# Googlebot
+User-agent: Googlebot
+Allow: /
+Disallow: /admin/
+Disallow: /staff-portal/
+Disallow: /student-portal/
+
+# Bingbot
+User-agent: Bingbot
+Allow: /
+Disallow: /admin/
+Disallow: /staff-portal/
+Disallow: /student-portal/
