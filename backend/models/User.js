@@ -59,6 +59,10 @@ const userSchema = new mongoose.Schema({
     address: {
       type: String,
       trim: true
+    },
+    department: {
+      type: String,
+      trim: true
     }
   },
   resetPasswordToken: String,

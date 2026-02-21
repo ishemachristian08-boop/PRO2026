@@ -5,12 +5,12 @@ const jwt = require('jsonwebtoken')
 const { body, validationResult } = require('express-validator')
 
 const User = require('../models/User')
-const auth = require('../middleware/auth')
+const { protect } = require('../middleware/auth')
 
 // @route   GET api/teachers
 // @desc    Get all teachers
 // @access  Private (Admin only)
-router.get('/', auth, async (req, res) => {
+router.get('/', protect, async (req, res) => {
   try {
     // Only admins can view all teachers
     if (req.user.role !== 'admin') {
@@ -41,7 +41,7 @@ router.get('/', auth, async (req, res) => {
 // @route   GET api/teachers/:id
 // @desc    Get teacher by ID
 // @access  Private (Admin only)
-router.get('/:id', auth, async (req, res) => {
+router.get('/:id', protect, async (req, res) => {
   try {
     // Only admins can view teacher details
     if (req.user.role !== 'admin') {
@@ -90,7 +90,7 @@ router.get('/:id', auth, async (req, res) => {
 // @desc    Create new teacher
 // @access  Private (Admin only)
 router.post('/', [
-  auth,
+  protect,
   [
     body('username', 'Username is required').not().isEmpty(),
     body('email', 'Please include a valid email').isEmail(),
@@ -143,9 +143,11 @@ router.post('/', [
       username,
       email,
       password,
-      firstName,
-      lastName,
-      phone,
+      profile: {
+        firstName,
+        lastName,
+        phone
+      },
       department,
       role: 'teacher',
       isActive: true
@@ -204,7 +206,7 @@ router.post('/', [
 // @route   PUT api/teachers/:id
 // @desc    Update teacher
 // @access  Private (Admin only)
-router.put('/:id', auth, async (req, res) => {
+router.put('/:id', protect, async (req, res) => {
   try {
     // Only admins can update teachers
     if (req.user.role !== 'admin') {
@@ -269,7 +271,7 @@ router.put('/:id', auth, async (req, res) => {
 // @route   DELETE api/teachers/:id
 // @desc    Delete teacher
 // @access  Private (Admin only)
-router.delete('/:id', auth, async (req, res) => {
+router.delete('/:id', protect, async (req, res) => {
   try {
     // Only admins can delete teachers
     if (req.user.role !== 'admin') {
@@ -322,7 +324,7 @@ router.delete('/:id', auth, async (req, res) => {
 // @route   GET api/teachers/:id/students
 // @desc    Get students assigned to a teacher
 // @access  Private (Admin and Teacher)
-router.get('/:id/students', auth, async (req, res) => {
+router.get('/:id/students', protect, async (req, res) => {
   try {
     const teacherId = req.params.id
     const currentUserId = req.user.id
@@ -393,7 +395,7 @@ router.get('/:id/students', auth, async (req, res) => {
 // @route   PUT api/teachers/:id/activate
 // @desc    Activate teacher account
 // @access  Private (Admin only)
-router.put('/:id/activate', auth, async (req, res) => {
+router.put('/:id/activate', protect, async (req, res) => {
   try {
     if (req.user.role !== 'admin') {
       return res.status(403).json({ 
@@ -437,7 +439,7 @@ router.put('/:id/activate', auth, async (req, res) => {
 // @route   PUT api/teachers/:id/deactivate
 // @desc    Deactivate teacher account
 // @access  Private (Admin only)
-router.put('/:id/deactivate', auth, async (req, res) => {
+router.put('/:id/deactivate', protect, async (req, res) => {
   try {
     if (req.user.role !== 'admin') {
       return res.status(403).json({ 

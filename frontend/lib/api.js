@@ -105,6 +105,10 @@ const apiClient = {
       return request('/auth/me')
     },
 
+    async getUsers() {
+      return request('/auth/users')
+    },
+
     async updateProfile(profileData) {
       return request('/auth/profile', {
         method: 'PUT',

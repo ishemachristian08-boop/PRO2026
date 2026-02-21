@@ -225,6 +225,34 @@ router.get('/me', protect, async (req, res) => {
   }
 });
 
+// @desc    Get all users (for admin to select parents)
+// @route   GET /api/auth/users
+// @access  Private/Admin
+router.get('/users', protect, async (req, res) => {
+  try {
+    // Only admins can view all users
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied. Admin privileges required.'
+      });
+    }
+
+    const users = await User.find().select('-password -securityCode');
+
+    res.json({
+      success: true,
+      data: users
+    });
+  } catch (error) {
+    console.error('Get users error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error'
+    });
+  }
+});
+
 // @desc    Logout user
 // @route   POST /api/auth/logout
 // @access  Private

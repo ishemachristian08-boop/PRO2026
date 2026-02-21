@@ -1,7 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'export',
   images: {
     // Allow images from Cloudinary and other external sources
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',
