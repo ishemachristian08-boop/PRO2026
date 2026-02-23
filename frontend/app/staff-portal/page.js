@@ -6,7 +6,7 @@ import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
-import { useAuth } from '../../lib/auth'
+import { useAuth } from '@lib/auth'
 import { ShieldCheckIcon, LockClosedIcon, UserIcon, KeyIcon } from '@heroicons/react/24/outline'
 
 export default function StaffPortalPage() {

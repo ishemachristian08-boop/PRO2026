@@ -11,7 +11,7 @@ import {
   UserGroupIcon,
   SearchIcon,
 } from '@heroicons/react/24/outline'
-import apiClient from '../../../lib/api'
+import apiClient from '@lib/api'
 
 export default function AdminSettingsPage() {
   const [activeTab, setActiveTab] = useState('general')

@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react'
 import Head from 'next/head'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { useAuth } from '../../../lib/auth'
-import apiClient from '../../../lib/api'
+import { useAuth } from '@lib/auth'
+import apiClient from '@lib/api'
 import {
   AcademicCapIcon,
   UserIcon,

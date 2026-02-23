@@ -4,8 +4,8 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Head from 'next/head'
 import Link from 'next/link'
-import { useAuth } from '../../../lib/auth'
-import apiClient from '../../../lib/api'
+import { useAuth } from '@lib/auth'
+import apiClient from '@lib/api'
 import {
   ArrowLeftIcon,
   UserIcon,

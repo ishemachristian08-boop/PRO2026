@@ -9,7 +9,7 @@ import {
   TrashIcon,
   CalendarIcon,
 } from '@heroicons/react/24/outline'
-import apiClient from '../../../lib/api'
+import apiClient from '@lib/api'
 
 export default function AdminEventsPage() {
   const [events, setEvents] = useState([])

@@ -8,6 +8,9 @@ const path = require('path');
 const fs = require('fs');
 require('dotenv').config();
 
+// Check if running on Firebase Cloud Functions
+const isFirebase = process.env.FUNCTIONS_EMULATOR || process.env.GCLOUD_PROJECT;
+
 // Create uploads directory if it doesn't exist
 const uploadsDir = path.join(__dirname, 'uploads');
 const studentsUploadsDir = path.join(__dirname, 'uploads/students');
@@ -123,10 +126,12 @@ const connectDB = async () => {
     await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/nca');
     console.log('Connected to MongoDB');
     
-    // Start server
-    app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
-    });
+    // Start server only if not on Firebase
+    if (!isFirebase) {
+      app.listen(PORT, () => {
+        console.log(`Server running on port ${PORT}`);
+      });
+    }
   } catch (err) {
     console.error('Database connection error:', err.message);
     console.log('Retrying connection in 5 seconds...');
@@ -134,4 +139,15 @@ const connectDB = async () => {
   }
 };
 
-connectDB();
+// Export for Firebase Cloud Functions
+// eslint-disable-next-line max-len
+const https = require('https');
+const { httpsCallable } = require('firebase-functions/v2/https');
+
+// Export the Express app as a Firebase Cloud Function
+exports.api = https.onRequest(app);
+
+// Start the server if not on Firebase
+if (!isFirebase) {
+  connectDB();
+}

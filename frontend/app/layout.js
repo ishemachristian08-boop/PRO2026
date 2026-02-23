@@ -1,5 +1,5 @@
 import '../styles/globals.css'
-import { AuthProvider } from '../lib/auth'
+import { AuthProvider } from '@lib/auth'
 import SplashScreen from '../components/SplashScreen'
 
 export const metadata = {

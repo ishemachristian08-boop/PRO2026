@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
-import apiClient from '../../lib/api'
+import apiClient from '@lib/api'
 
 const placeholderPhotos = [
   { title: 'Classroom Learning', category: 'Academics', color: 'from-blue-200 to-blue-300' },

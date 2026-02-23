@@ -17,8 +17,8 @@ import {
   BellIcon,
   ClockIcon,
 } from '@heroicons/react/24/outline'
-import { useAuth } from '../../../lib/auth'
-import apiClient from '../../../lib/api'
+import { useAuth } from '@lib/auth'
+import apiClient from '@lib/api'
 
 const staffFeatures = [
   {

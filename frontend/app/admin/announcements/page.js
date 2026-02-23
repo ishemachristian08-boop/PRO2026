@@ -11,7 +11,7 @@ import {
   CheckCircleIcon,
   XCircleIcon,
 } from '@heroicons/react/24/outline'
-import apiClient from '../../../lib/api'
+import apiClient from '@lib/api'
 
 export default function AdminAnnouncementsPage() {
   const [announcements, setAnnouncements] = useState([])

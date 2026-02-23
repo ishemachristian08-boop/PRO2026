@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'export',
+  distDir: '.next',
   images: {
     // Allow images from Cloudinary and other external sources
     unoptimized: true,
@@ -18,6 +19,14 @@ const nextConfig = {
   },
   // Suppress hydration warnings from browser extensions
   reactStrictMode: true,
+  // Add path alias
+  webpack: (config) => {
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@lib': require('path').resolve(__dirname, 'lib'),
+    };
+    return config;
+  },
 }
 
 module.exports = nextConfig

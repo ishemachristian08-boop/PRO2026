@@ -1,0 +1,49 @@
+{
+  "hosting": {
+    "public": "frontend/public",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "/api/**",
+        "function": "api"
+      },
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ],
+    "headers": [
+      {
+        "source": "/**",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, no-store, must-revalidate"
+          },
+          {
+            "key": "Pragma",
+            "value": "no-cache"
+          },
+          {
+            "key": "Expires",
+            "value": "0"
+          }
+        ]
+      }
+    ]
+  },
+  "functions": {
+    "source": "backend",
+    "codebase": "default",
+    "ignore": [
+      "node_modules",
+      ".git",
+      "firebase-debug.log",
+      "firebase-debug.*.log"
+    ]
+  }
+}

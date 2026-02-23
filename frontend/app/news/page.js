@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
-import apiClient from '../../lib/api'
+import apiClient from '@lib/api'
 
 const placeholderItems = [
   { type: 'Announcement', title: 'Term I Admission Ongoing', date: '2026-01-10', description: 'Applications for Term I are now open. Contact the admissions office for more information.' },
