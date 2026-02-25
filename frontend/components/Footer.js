@@ -207,7 +207,7 @@ export default function Footer() {
       <div className="bg-gray-800 py-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <p className="text-center text-gray-400 text-sm">
-            Designed with ❤️ for NYABIHU CHRISTIAN ACADEMY — Nyabihu District, Rwanda
+            Designed with <a href='file:///D:/MY%20projects/last/index.html'>__SHEMA__</a> for NYABIHU CHRISTIAN ACADEMY — Nyabihu District, Rwanda
           </p>
         </div>
       </div>

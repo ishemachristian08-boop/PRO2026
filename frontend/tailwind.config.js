@@ -9,8 +9,8 @@ module.exports = {
     extend: {
       colors: {
         primary: {
-          50: '#e8f0ff',
-          100: '#c5d8ff',
+          50: '#415f96ff',
+          100: '#6590e6ff',
           200: '#80b3ff',
           300: '#4d94ff',
           400: '#1a75ff',
@@ -21,8 +21,8 @@ module.exports = {
           900: '#000d1a',
         },
         gold: {
-          50: '#fff9e6',
-          100: '#ffedc2',
+          50: '#0b2ca1ff',
+          100: '#4063c5ff',
           200: '#ffe2a3',
           300: '#ffd785',
           400: '#ffcc66', // Main gold
