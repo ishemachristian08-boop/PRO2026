@@ -130,8 +130,7 @@ const studentSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Index for faster queries
-studentSchema.index({ admissionNumber: 1 });
+// Index for faster queries (unique:true already creates index automatically)
 studentSchema.index({ parent: 1 });
 studentSchema.index({ grade: 1 });
 

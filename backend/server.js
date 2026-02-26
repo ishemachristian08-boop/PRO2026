@@ -41,6 +41,7 @@ const teacherRoutes = require('./routes/teachers');
 const announcementRoutes = require('./routes/announcements');
 const eventRoutes = require('./routes/events');
 const galleryRoutes = require('./routes/gallery');
+const chatbotRoutes = require('./routes/chatbot');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -92,6 +93,7 @@ app.use('/api/teachers', teacherRoutes);
 app.use('/api/announcements', announcementRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/gallery', galleryRoutes);
+app.use('/api/chatbot', chatbotRoutes);
 
 // Root endpoint
 app.get('/', (req, res) => {
@@ -123,8 +125,22 @@ app.use('*', (req, res) => {
 // Database connection with retry logic
 const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/nca');
-    console.log('Connected to MongoDB');
+    const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/nca';
+    
+    const options = {
+      maxPoolSize: 10,
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+    };
+    
+    // Add retryWrites for Atlas
+    if (mongoUri.includes('mongodb.net')) {
+      options.retryWrites = true;
+      options.w = 'majority';
+    }
+    
+    await mongoose.connect(mongoUri, options);
+    console.log('Connected to MongoDB' + (mongoUri.includes('mongodb.net') ? ' Atlas' : ''));
     
     // Start server only if not on Firebase
     if (!isFirebase) {
@@ -139,13 +155,16 @@ const connectDB = async () => {
   }
 };
 
-// Export for Firebase Cloud Functions
-// eslint-disable-next-line max-len
-const https = require('https');
-const { httpsCallable } = require('firebase-functions/v2/https');
-
-// Export the Express app as a Firebase Cloud Function
-exports.api = https.onRequest(app);
+// Export for Firebase Cloud Functions (only when deployed to Firebase)
+// The firebase-functions package handles the export properly
+try {
+  if (process.env.GCLOUD_PROJECT || process.env.FUNCTIONS_EMULATOR) {
+    const { onRequest } = require('firebase-functions/v2/https');
+    exports.api = onRequest(app);
+  }
+} catch (e) {
+  // Firebase functions not available locally - this is fine
+}
 
 // Start the server if not on Firebase
 if (!isFirebase) {

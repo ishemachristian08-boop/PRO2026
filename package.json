@@ -39,5 +39,8 @@
   "bugs": {
     "url": "https://github.com/nca-rwanda/nca-website/issues"
   },
-  "homepage": "https://github.com/nca-rwanda/nca-website#readme"
+  "homepage": "https://github.com/nca-rwanda/nca-website#readme",
+  "dependencies": {
+    "mongoose": "^9.2.2"
+  }
 }

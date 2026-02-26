@@ -1,6 +1,7 @@
 import '../styles/globals.css'
 import { AuthProvider } from '@lib/auth'
 import SplashScreen from '../components/SplashScreen'
+import Chatbot from '../components/Chatbot'
 
 export const metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://nca.rw'),
@@ -74,6 +75,7 @@ export default function RootLayout({ children }) {
         <AuthProvider>
           {children}
         </AuthProvider>
+        <Chatbot />
       </body>
     </html>
   )
