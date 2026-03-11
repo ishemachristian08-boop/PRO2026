@@ -18,7 +18,7 @@ export default function AdminAnnouncementsPage() {
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [editItem, setEditItem] = useState(null)
-  const [form, setForm] = useState({ title: '', content: '', category: 'general', audience: 'all' })
+  const [form, setForm] = useState({ title: '', content: '', category: 'General', audience: ['All'] })
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
 
@@ -51,7 +51,7 @@ export default function AdminAnnouncementsPage() {
       }
       setShowForm(false)
       setEditItem(null)
-      setForm({ title: '', content: '', category: 'general', audience: 'all' })
+      setForm({ title: '', content: '', category: 'General', audience: ['All'] })
       fetchAnnouncements()
     } catch (err) {
       setMessage(err.message || 'Failed to save announcement.')
@@ -62,7 +62,12 @@ export default function AdminAnnouncementsPage() {
 
   const handleEdit = (item) => {
     setEditItem(item)
-    setForm({ title: item.title, content: item.content, category: item.category || 'general', audience: item.audience || 'all' })
+    setForm({ 
+      title: item.title, 
+      content: item.content, 
+      category: item.category || 'General', 
+      audience: item.audience || ['All'] 
+    })
     setShowForm(true)
   }
 
@@ -103,7 +108,7 @@ export default function AdminAnnouncementsPage() {
               </div>
             </div>
             <button
-              onClick={() => { setShowForm(true); setEditItem(null); setForm({ title: '', content: '', category: 'general', audience: 'all' }) }}
+              onClick={() => { setShowForm(true); setEditItem(null); setForm({ title: '', content: '', category: 'General', audience: ['All'] }) }}
               className="flex items-center gap-2 bg-primary-500 text-white px-4 py-2 rounded-lg hover:bg-primary-600 transition-colors"
             >
               <PlusIcon className="w-5 h-5" />
@@ -161,23 +166,31 @@ export default function AdminAnnouncementsPage() {
                     onChange={(e) => setForm({ ...form, category: e.target.value })}
                     className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   >
-                    <option value="general">General</option>
-                    <option value="academic">Academic</option>
-                    <option value="event">Event</option>
-                    <option value="urgent">Urgent</option>
+                    <option value="General">General</option>
+                    <option value="Academic">Academic</option>
+                    <option value="Events">Events</option>
+                    <option value="News">News</option>
+                    <option value="Important">Important</option>
                   </select>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Audience</label>
                   <select
-                    value={form.audience}
-                    onChange={(e) => setForm({ ...form, audience: e.target.value })}
+                    value={form.audience[0] || 'All'}
+                    onChange={(e) => setForm({ ...form, audience: [e.target.value] })}
                     className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   >
-                    <option value="all">All</option>
-                    <option value="students">Students</option>
-                    <option value="parents">Parents</option>
-                    <option value="teachers">Teachers</option>
+                    <option value="All">All</option>
+                    <option value="Students">Students</option>
+                    <option value="Parents">Parents</option>
+                    <option value="Teachers">Teachers</option>
+                    <option value="Nursery">Nursery</option>
+                    <option value="P1">P1</option>
+                    <option value="P2">P2</option>
+                    <option value="P3">P3</option>
+                    <option value="P4">P4</option>
+                    <option value="P5">P5</option>
+                    <option value="P6">P6</option>
                   </select>
                 </div>
               </div>
@@ -218,12 +231,12 @@ export default function AdminAnnouncementsPage() {
                         {item.status || 'draft'}
                       </span>
                       <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
-                        {item.category || 'general'}
+                        {item.category || 'General'}
                       </span>
                     </div>
                     <p className="text-gray-600 text-sm line-clamp-2">{item.content}</p>
                     <p className="text-gray-400 text-xs mt-2">
-                      Audience: {item.audience || 'all'} · Created: {item.createdAt?.slice(0, 10)}
+                      Audience: {item.audience || 'All'} · Created: {item.createdAt?.slice(0, 10)}
                     </p>
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">

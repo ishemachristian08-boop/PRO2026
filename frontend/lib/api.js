@@ -402,10 +402,30 @@ const apiClient = {
     },
 
     async create(galleryData) {
+      // If it's FormData, don't stringify it
+      if (galleryData instanceof FormData) {
+        const token = localStorage.getItem('token')
+        const response = await fetch(`${API_URL}/gallery`, {
+          method: 'POST',
+          headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+          body: galleryData,
+        })
+        return response.json()
+      }
       return request('/gallery', {
         method: 'POST',
         body: JSON.stringify(galleryData),
       })
+    },
+
+    async uploadWithImages(formData) {
+      const token = localStorage.getItem('token')
+      const response = await fetch(`${API_URL}/gallery/upload`, {
+        method: 'POST',
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+        body: formData,
+      })
+      return response.json()
     },
 
     async update(id, galleryData) {

@@ -60,14 +60,18 @@ export default function Home() {
       <Navbar />
 
       {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-primary-50 via-white to-gold-50">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 hero-pattern"></div>
-        
-        {/* Floating Elements */}
-        <div className="absolute top-20 left-10 w-32 h-32 bg-primary-200 rounded-full opacity-20 animate-pulse"></div>
-        <div className="absolute top-40 right-20 w-24 h-24 bg-gold-200 rounded-full opacity-30 animate-pulse" style={{ animationDelay: '1s' }}></div>
-        <div className="absolute bottom-20 left-1/3 w-40 h-40 bg-primary-300 rounded-full opacity-20 animate-pulse" style={{ animationDelay: '2s' }}></div>
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+        {/* Background Image */}
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="/Front.png"
+            alt="School Building"
+            fill
+            className="object-cover"
+            priority
+          />
+          <div className="absolute inset-0 bg-black/60" />
+        </div>
 
         <div className="relative z-10 text-center px-4 sm:px-6 lg:px-8">
           <motion.div
@@ -96,7 +100,7 @@ export default function Home() {
             </motion.div>
 
             {/* School Name */}
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-primary-900 mb-4">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-4">
               NYABIHU
               <br />
               <span className="text-gradient">CHRISTIAN ACADEMY</span>
@@ -107,7 +111,7 @@ export default function Home() {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={isLoaded ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.9 }}
               transition={{ duration: 0.8, delay: 0.2, ease: 'easeOut' }}
-              className="text-lg sm:text-xl md:text-2xl text-gray-700 mb-8 font-medium"
+              className="text-lg sm:text-xl md:text-2xl text-white mb-8 font-medium"
             >
               Generate a Child, Transform Generation
             </motion.p>
@@ -117,7 +121,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={isLoaded ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
               transition={{ duration: 0.8, delay: 0.4, ease: 'easeOut' }}
-              className="text-base sm:text-lg text-gray-600 mb-12 max-w-2xl mx-auto leading-relaxed"
+              className="text-base sm:text-lg text-white/90 mb-12 max-w-2xl mx-auto leading-relaxed"
             >
               Excellence in Christian Education for Nursery and Primary levels in Nyabihu District, Rwanda. 
               We provide a nurturing environment where children grow academically, spiritually, and socially.

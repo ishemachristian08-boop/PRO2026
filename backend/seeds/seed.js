@@ -28,7 +28,7 @@ async function seedDatabase() {
 
     // Hash password
     const saltRounds = 12
-    const hashedPassword = await bcrypt.hash('password123', saltRounds)
+    const hashedPassword = await bcrypt.hash('01Jan08!', saltRounds)
 
     // Create users
     console.log('Creating users...')
@@ -38,7 +38,11 @@ async function seedDatabase() {
       email: 'admin@nca.rw',
       password: hashedPassword,
       role: 'admin',
-      isActive: true
+      isActive: true,
+      profile: {
+        firstName: 'Admin',
+        lastName: 'User'
+      }
     })
     await adminUser.save()
 
@@ -47,7 +51,11 @@ async function seedDatabase() {
       email: 'teacher@nca.rw',
       password: hashedPassword,
       role: 'teacher',
-      isActive: true
+      isActive: true,
+      profile: {
+        firstName: 'John',
+        lastName: 'Teacher'
+      }
     })
     await teacherUser.save()
 
@@ -56,7 +64,11 @@ async function seedDatabase() {
       email: 'parent@nca.rw',
       password: hashedPassword,
       role: 'parent',
-      isActive: true
+      isActive: true,
+      profile: {
+        firstName: 'Jane',
+        lastName: 'Parent'
+      }
     })
     await parentUser.save()
 
@@ -69,6 +81,7 @@ async function seedDatabase() {
       firstName: 'John',
       lastName: 'Doe',
       dateOfBirth: new Date('2020-03-15'),
+      gender: 'Male',
       grade: 'Nursery',
       admissionNumber: 'NCA001',
       parent: parentUser._id,
@@ -99,6 +112,7 @@ async function seedDatabase() {
       firstName: 'Jane',
       lastName: 'Smith',
       dateOfBirth: new Date('2019-08-22'),
+      gender: 'Female',
       grade: 'P1',
       admissionNumber: 'NCA002',
       parent: parentUser._id,
@@ -156,7 +170,7 @@ async function seedDatabase() {
     const announcement3 = new Announcement({
       title: 'New School Uniform',
       content: 'The school has introduced a new uniform policy effective from the next term. Please check the school notice board for details.',
-      category: 'Announcements',
+      category: 'Important',
       audience: 'All',
       author: adminUser._id,
       isPublished: false
@@ -227,16 +241,19 @@ async function seedDatabase() {
       isFeatured: true,
       images: [
         {
+          filename: 'sports-day-1.jpg',
           url: 'https://example.com/images/sports-day-1.jpg',
           caption: 'Opening ceremony',
           uploadedAt: new Date()
         },
         {
+          filename: 'sports-day-2.jpg',
           url: 'https://example.com/images/sports-day-2.jpg',
           caption: 'Relay race',
           uploadedAt: new Date()
         },
         {
+          filename: 'sports-day-3.jpg',
           url: 'https://example.com/images/sports-day-3.jpg',
           caption: 'Award ceremony',
           uploadedAt: new Date()
@@ -254,11 +271,13 @@ async function seedDatabase() {
       isFeatured: false,
       images: [
         {
+          filename: 'classroom-1.jpg',
           url: 'https://example.com/images/classroom-1.jpg',
           caption: 'Math lesson',
           uploadedAt: new Date()
         },
         {
+          filename: 'classroom-2.jpg',
           url: 'https://example.com/images/classroom-2.jpg',
           caption: 'Science experiment',
           uploadedAt: new Date()
@@ -276,6 +295,7 @@ async function seedDatabase() {
       isFeatured: false,
       images: [
         {
+          filename: 'christmas-1.jpg',
           url: 'https://example.com/images/christmas-1.jpg',
           caption: 'Christmas tree decoration',
           uploadedAt: new Date()

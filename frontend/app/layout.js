@@ -2,6 +2,7 @@ import '../styles/globals.css'
 import { AuthProvider } from '@lib/auth'
 import SplashScreen from '../components/SplashScreen'
 import Chatbot from '../components/Chatbot'
+import '../lib/firebase'
 
 export const metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://nca.rw'),
@@ -66,8 +67,8 @@ export default function RootLayout({ children }) {
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-        <link rel="icon" href="/favicon.ico" sizes="any" />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="icon" href="/nca logo.png" sizes="any" type="image/png" />
+        <link rel="apple-touch-icon" href="/nca logo.png" />
         <link rel="manifest" href="/manifest.json" />
       </head>
       <body>

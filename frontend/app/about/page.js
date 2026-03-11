@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import Image from 'next/image'
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
 
@@ -9,12 +10,22 @@ export default function AboutPage() {
     <div className="min-h-screen bg-white">
       <Navbar />
 
-      <section className="pt-32 pb-16 bg-gradient-to-br from-primary-50 via-white to-gold-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-4xl md:text-5xl font-bold text-primary-900 mb-4">
+      <section className="relative pt-32 pb-16 h-[500px] flex items-center">
+        <div className="absolute inset-0 z-0">
+          <Image
+            src="/Front.png"
+            alt="School Building"
+            fill
+            className="object-cover"
+            priority
+          />
+          <div className="absolute inset-0 bg-black/50" />
+        </div>
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-4xl md:text-5xl font-bold text-white mb-4">
             About NYABIHU CHRISTIAN ACADEMY
           </motion.h1>
-          <p className="text-lg text-gray-700 max-w-3xl">
+          <p className="text-lg text-white/90 max-w-3xl">
             We are a Christian-based private school in Nyabihu District, Rwanda, offering Nursery and Primary education (P1–P6).
           </p>
         </div>

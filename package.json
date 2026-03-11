@@ -26,7 +26,7 @@
   "author": "NYABIHU CHRISTIAN ACADEMY",
   "license": "MIT",
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^9.2.1"
   },
   "engines": {
     "node": ">=16.0.0",
@@ -41,6 +41,7 @@
   },
   "homepage": "https://github.com/nca-rwanda/nca-website#readme",
   "dependencies": {
-    "mongoose": "^9.2.2"
+    "mongoose": "^9.2.4",
+    "next.js": "^1.0.3"
   }
 }

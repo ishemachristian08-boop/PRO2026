@@ -96,14 +96,21 @@ export default function NewGalleryPage() {
     setError(null)
 
     try {
-      // Create gallery data
-      const galleryData = {
-        ...formData,
-        tags: formData.tags
-      }
+      // Use FormData to handle file uploads
+      const data = new FormData()
+      data.append('title', formData.title)
+      data.append('description', formData.description)
+      data.append('category', formData.category)
+      data.append('tags', JSON.stringify(formData.tags))
+      data.append('isPublic', formData.isPublic)
+      data.append('featured', formData.featured)
+      
+      // Append files
+      selectedFiles.forEach((file) => {
+        data.append('images', file)
+      })
 
-      // First create the gallery
-      const response = await apiClient.gallery.create(galleryData)
+      const response = await apiClient.gallery.create(data)
       
       if (response.success) {
         alert('Gallery created successfully!')
@@ -256,8 +263,79 @@ export default function NewGalleryPage() {
 
           {/* Options */}
           <div className="p-6 border-b border-gray-200">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+              <CloudArrowUpIcon className="w-5 h-5 mr-2" />
+              Upload Images
+            </h2>
+            
+            <div className="mt-2">
+              <div className="flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-primary-400 transition-colors">
+                <div className="space-y-1 text-center">
+                  <PhotoIcon className="mx-auto h-12 w-12 text-gray-400" />
+                  <div className="flex text-sm text-gray-600">
+                    <label
+                      htmlFor="file-upload"
+                      className="relative cursor-pointer bg-white rounded-md font-medium text-primary-600 hover:text-primary-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary-500"
+                    >
+                      <span>Upload images from device</span>
+                      <input
+                        id="file-upload"
+                        name="file-upload"
+                        type="file"
+                        multiple
+                        accept="image/*"
+                        onChange={handleFileChange}
+                        className="sr-only"
+                      />
+                    </label>
+                    <p className="pl-1">or drag and drop</p>
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    PNG, JPG, GIF up to 10MB each
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Preview Images */}
+            {previewUrls.length > 0 && (
+              <div className="mt-4">
+                <h3 className="text-sm font-medium text-gray-700 mb-2">
+                  Selected Images ({previewUrls.length})
+                </h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {previewUrls.map((url, index) => (
+                    <div key={index} className="relative aspect-square rounded-lg overflow-hidden bg-gray-100">
+                      <img
+                        src={url}
+                        alt={`Preview ${index + 1}`}
+                        className="w-full h-full object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const newFiles = selectedFiles.filter((_, i) => i !== index)
+                          const newUrls = previewUrls.filter((_, i) => i !== index)
+                          setSelectedFiles(newFiles)
+                          setPreviewUrls(newUrls)
+                        }}
+                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Publish Options */}
+          <div className="p-6 border-b border-gray-200">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">
-              Options
+              Publish Options
             </h2>
             
             <div className="space-y-4">

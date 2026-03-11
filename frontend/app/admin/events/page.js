@@ -22,8 +22,8 @@ export default function AdminEventsPage() {
     startDate: '',
     endDate: '',
     location: '',
-    eventType: 'school',
-    audience: 'all',
+    eventType: 'Academic',
+    audience: ['All'],
   })
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
@@ -57,7 +57,7 @@ export default function AdminEventsPage() {
       }
       setShowForm(false)
       setEditItem(null)
-      setForm({ title: '', description: '', startDate: '', endDate: '', location: '', eventType: 'school', audience: 'all' })
+      setForm({ title: '', description: '', startDate: '', endDate: '', location: '', eventType: 'Academic', audience: ['All'] })
       fetchEvents()
     } catch (err) {
       setMessage(err.message || 'Failed to save event.')
@@ -74,8 +74,8 @@ export default function AdminEventsPage() {
       startDate: item.startDate?.slice(0, 10),
       endDate: item.endDate?.slice(0, 10),
       location: item.location || '',
-      eventType: item.eventType || 'school',
-      audience: item.audience || 'all',
+      eventType: item.eventType || 'Academic',
+      audience: item.audience || ['All'],
     })
     setShowForm(true)
   }
@@ -106,7 +106,7 @@ export default function AdminEventsPage() {
               </div>
             </div>
             <button
-              onClick={() => { setShowForm(true); setEditItem(null); setForm({ title: '', description: '', startDate: '', endDate: '', location: '', eventType: 'school', audience: 'all' }) }}
+              onClick={() => { setShowForm(true); setEditItem(null); setForm({ title: '', description: '', startDate: '', endDate: '', location: '', eventType: 'Academic', audience: ['All'] }) }}
               className="flex items-center gap-2 bg-primary-500 text-white px-4 py-2 rounded-lg hover:bg-primary-600 transition-colors"
             >
               <PlusIcon className="w-5 h-5" />
@@ -194,24 +194,33 @@ export default function AdminEventsPage() {
                     onChange={(e) => setForm({ ...form, eventType: e.target.value })}
                     className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   >
-                    <option value="school">School</option>
-                    <option value="academic">Academic</option>
-                    <option value="sports">Sports</option>
-                    <option value="cultural">Cultural</option>
-                    <option value="religious">Religious</option>
+                    <option value="Academic">Academic</option>
+                    <option value="Sports">Sports</option>
+                    <option value="Cultural">Cultural</option>
+                    <option value="Religious">Religious</option>
+                    <option value="Community">Community</option>
+                    <option value="Fundraising">Fundraising</option>
+                    <option value="Other">Other</option>
                   </select>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Audience</label>
                   <select
-                    value={form.audience}
-                    onChange={(e) => setForm({ ...form, audience: e.target.value })}
+                    value={form.audience[0] || 'All'}
+                    onChange={(e) => setForm({ ...form, audience: [e.target.value] })}
                     className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   >
-                    <option value="all">All</option>
-                    <option value="students">Students</option>
-                    <option value="parents">Parents</option>
-                    <option value="teachers">Teachers</option>
+                    <option value="All">All</option>
+                    <option value="Students">Students</option>
+                    <option value="Parents">Parents</option>
+                    <option value="Teachers">Teachers</option>
+                    <option value="Nursery">Nursery</option>
+                    <option value="P1">P1</option>
+                    <option value="P2">P2</option>
+                    <option value="P3">P3</option>
+                    <option value="P4">P4</option>
+                    <option value="P5">P5</option>
+                    <option value="P6">P6</option>
                   </select>
                 </div>
               </div>

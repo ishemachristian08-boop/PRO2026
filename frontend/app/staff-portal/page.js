@@ -3,78 +3,64 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { motion, AnimatePresence } from 'framer-motion'
+import Image from 'next/image'
+import { motion } from 'framer-motion'
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
-import { useAuth } from '@lib/auth'
-import { ShieldCheckIcon, LockClosedIcon, UserIcon, KeyIcon } from '@heroicons/react/24/outline'
+import { loginWithEmail, loginWithGoogle } from '@lib/firebaseAuth'
+import { ShieldCheckIcon, LockClosedIcon } from '@heroicons/react/24/outline'
 
 export default function StaffPortalPage() {
-  const [step, setStep] = useState(1) // 1 = credentials, 2 = security code
-  const [form, setForm] = useState({ email: '', password: '', securityCode: '' })
+  const [form, setForm] = useState({ email: '', password: '' })
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const { login } = useAuth()
   const router = useRouter()
 
-  const handleCredentialsSubmit = async (e) => {
+  const handleEmailLogin = async (e) => {
     e.preventDefault()
     setError('')
     setLoading(true)
 
     try {
-      const result = await login(form.email, form.password)
+      const result = await loginWithEmail(form.email, form.password)
+      
       if (result.success) {
-        // Check if security code is required
-        if (result.requiresSecurityCode) {
-          setStep(2)
-          setLoading(false)
-        } else {
-          // No security code required, redirect to admin
-          router.push('/admin')
-        }
-      } else {
-        if (result.requiresSecurityCode) {
-          setStep(2)
-        } else {
-          setError(result.message || 'Invalid email or password. Please try again.')
-        }
-      }
-    } catch (err) {
-      setError('An unexpected error occurred. Please try again.')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleSecurityCodeSubmit = async (e) => {
-    e.preventDefault()
-    setError('')
-    setLoading(true)
-
-    try {
-      const result = await login(form.email, form.password, form.securityCode)
-      if (result.success) {
-        // Determine redirect based on role
-        if (result.data?.role === 'admin') {
-          router.push('/admin')
-        } else {
+        if (result.user.role === 'admin' || result.user.role === 'teacher' || result.user.role === 'staff') {
           router.push('/staff-portal/dashboard')
+        } else {
+          setError('Access denied. Staff/Teacher only.')
         }
       } else {
-        setError(result.message || 'Invalid security code. Please try again.')
+        setError(result.message || 'Invalid email or password.')
       }
     } catch (err) {
-      setError('An unexpected error occurred. Please try again.')
+      setError('An unexpected error occurred.')
     } finally {
       setLoading(false)
     }
   }
 
-  const goBack = () => {
-    setStep(1)
-    setForm({ ...form, securityCode: '' })
+  const handleGoogleLogin = async () => {
     setError('')
+    setLoading(true)
+
+    try {
+      const result = await loginWithGoogle()
+      
+      if (result.success) {
+        if (result.user.role === 'admin' || result.user.role === 'teacher' || result.user.role === 'staff') {
+          router.push('/staff-portal/dashboard')
+        } else {
+          setError('Access denied. Staff/Teacher only.')
+        }
+      } else {
+        setError(result.message || 'Google login failed.')
+      }
+    } catch (err) {
+      setError('Google login failed.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -82,178 +68,128 @@ export default function StaffPortalPage() {
       <Navbar />
 
       <section className="pt-32 pb-16 bg-gradient-to-br from-primary-50 via-white to-gold-50">
-        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-center gap-3 mb-3">
-            <ShieldCheckIcon className="w-10 h-10 text-primary-600" />
-            <h1 className="text-4xl font-bold text-primary-900">Staff Portal</h1>
+        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <div className="w-20 h-20 mx-auto mb-4 rounded-full overflow-hidden bg-white shadow-lg">
+            <Image
+              src="/nca logo.png"
+              alt="NCA Logo"
+              width={80}
+              height={80}
+              className="object-contain w-full h-full"
+            />
           </div>
-          <p className="text-gray-700 text-center">Secure access for teachers and school staff to manage records and class activities.</p>
+          <h1 className="text-4xl font-bold text-primary-900 mb-3">Staff Portal</h1>
+          <p className="text-gray-700">Access teaching materials, schedules, student information, and administrative tools.</p>
         </div>
       </section>
 
       <section className="py-16">
         <div className="max-w-xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="card p-8">
-            {/* Progress Indicator */}
-            <div className="flex items-center justify-center gap-4 mb-8">
-              <div className={`flex items-center gap-2 ${step >= 1 ? 'text-primary-600' : 'text-gray-400'}`}>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step >= 1 ? 'bg-primary-600 text-white' : 'bg-gray-200'} font-semibold`}>
-                  1
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="card p-8 shadow-lg"
+          >
+            {/* Features */}
+            <div className="mb-8 grid grid-cols-2 gap-4">
+              <div className="flex items-start gap-3 p-4 bg-blue-50 rounded-xl">
+                <ShieldCheckIcon className="w-6 h-6 text-blue-600 flex-shrink-0" />
+                <div>
+                  <h3 className="font-semibold text-gray-900 text-sm">Teacher Access</h3>
+                  <p className="text-xs text-gray-600">Manage classes & grades</p>
                 </div>
-                <span className="text-sm font-medium">Credentials</span>
               </div>
-              <div className="w-12 h-0.5 bg-gray-200">
-                <div className={`h-full bg-primary-600 transition-all duration-300 ${step >= 2 ? 'w-full' : 'w-0'}`}></div>
-              </div>
-              <div className={`flex items-center gap-2 ${step >= 2 ? 'text-primary-600' : 'text-gray-400'}`}>
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step >= 2 ? 'bg-primary-600 text-white' : 'bg-gray-200'} font-semibold`}>
-                  2
+              <div className="flex items-start gap-3 p-4 bg-green-50 rounded-xl">
+                <LockClosedIcon className="w-6 h-6 text-green-600 flex-shrink-0" />
+                <div>
+                  <h3 className="font-semibold text-gray-900 text-sm">Secure Login</h3>
+                  <p className="text-xs text-gray-600">Protected access</p>
                 </div>
-                <span className="text-sm font-medium">Security Code</span>
               </div>
             </div>
 
-            <AnimatePresence mode="wait">
-              {step === 1 ? (
-                <motion.form
-                  key="step1"
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20 }}
-                  className="space-y-5"
-                  onSubmit={handleCredentialsSubmit}
-                >
-                  {error && (
-                    <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
-                      {error}
-                    </div>
-                  )}
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="email">
-                      <span className="flex items-center gap-2">
-                        <UserIcon className="w-4 h-4" />
-                        Staff Email
-                      </span>
-                    </label>
-                    <input
-                      id="email"
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-gold-500 focus:border-transparent transition-all duration-300"
-                      type="email"
-                      required
-                      placeholder="staff@nca.rw"
-                      value={form.email}
-                      onChange={(e) => setForm({ ...form, email: e.target.value })}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="password">
-                      <span className="flex items-center gap-2">
-                        <LockClosedIcon className="w-4 h-4" />
-                        Password
-                      </span>
-                    </label>
-                    <input
-                      id="password"
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-gold-500 focus:border-transparent transition-all duration-300"
-                      type="password"
-                      required
-                      placeholder="Enter your password"
-                      value={form.password}
-                      onChange={(e) => setForm({ ...form, password: e.target.value })}
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="btn-secondary w-full disabled:opacity-60 disabled:cursor-not-allowed"
-                  >
-                    {loading ? (
-                      <span className="flex items-center justify-center gap-2">
-                        <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></span>
-                        Verifying...
-                      </span>
-                    ) : 'Continue'}
-                  </button>
-                  <p className="text-center text-sm text-gray-600">
-                    Need help?{' '}
-                    <Link href="/contact" className="text-primary-600 hover:underline">
-                      Contact the school office
-                    </Link>
-                  </p>
-                </motion.form>
-              ) : (
-                <motion.form
-                  key="step2"
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  className="space-y-5"
-                  onSubmit={handleSecurityCodeSubmit}
-                >
-                  <div className="text-center mb-6">
-                    <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <KeyIcon className="w-8 h-8 text-primary-600" />
-                    </div>
-                    <h3 className="text-lg font-semibold text-gray-900">Security Verification</h3>
-                    <p className="text-sm text-gray-600 mt-1">Enter your security code to continue</p>
-                  </div>
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm mb-5">
+                {error}
+              </div>
+            )}
 
-                  {error && (
-                    <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
-                      {error}
-                    </div>
-                  )}
+            {/* Email Login */}
+            <form className="space-y-5" onSubmit={handleEmailLogin}>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="email">
+                  Staff Email
+                </label>
+                <input
+                  id="email"
+                  className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300"
+                  type="email"
+                  required
+                  placeholder="teacher@nca.rw"
+                  value={form.email}
+                  onChange={(e) => setForm({ ...form, email: e.target.value })}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="password">
+                  Password
+                </label>
+                <input
+                  id="password"
+                  className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-300"
+                  type="password"
+                  required
+                  placeholder="Enter your password"
+                  value={form.password}
+                  onChange={(e) => setForm({ ...form, password: e.target.value })}
+                />
+              </div>
+              <button
+                type="submit"
+                disabled={loading}
+                className="btn-primary w-full disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                {loading ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></span>
+                    Signing In...
+                  </span>
+                ) : 'Sign In with Email'}
+              </button>
+            </form>
 
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2" htmlFor="securityCode">
-                      <span className="flex items-center gap-2">
-                        <KeyIcon className="w-4 h-4" />
-                        Security Code
-                      </span>
-                    </label>
-                    <input
-                      id="securityCode"
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-gold-500 focus:border-transparent transition-all duration-300 text-center text-2xl tracking-widest font-mono"
-                      type="text"
-                      inputMode="numeric"
-                      pattern="[0-9]*"
-                      maxLength={6}
-                      required
-                      placeholder="••••••"
-                      value={form.securityCode}
-                      onChange={(e) => setForm({ ...form, securityCode: e.target.value.replace(/\D/g, '') })}
-                      autoFocus
-                    />
-                    <p className="text-xs text-gray-500 mt-2 text-center">
-                      Enter the 4-6 digit security code provided by your administrator
-                    </p>
-                  </div>
+            {/* Divider */}
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-200"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-2 bg-white text-gray-500">Or</span>
+              </div>
+            </div>
 
-                  <div className="flex gap-3">
-                    <button
-                      type="button"
-                      onClick={goBack}
-                      className="flex-1 bg-gray-100 text-gray-700 py-3 rounded-lg hover:bg-gray-200 transition-colors font-medium"
-                    >
-                      Back
-                    </button>
-                    <button
-                      type="submit"
-                      disabled={loading || form.securityCode.length < 4}
-                      className="flex-1 btn-secondary disabled:opacity-60 disabled:cursor-not-allowed"
-                    >
-                      {loading ? (
-                        <span className="flex items-center justify-center gap-2">
-                          <span className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></span>
-                          Verifying...
-                        </span>
-                      ) : 'Sign In'}
-                    </button>
-                  </div>
-                </motion.form>
-              )}
-            </AnimatePresence>
-          </div>
+            {/* Google Login */}
+            <button
+              onClick={handleGoogleLogin}
+              disabled={loading}
+              className="w-full py-3 bg-white border-2 border-gray-200 text-gray-700 font-semibold rounded-lg hover:bg-gray-50 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+            >
+              <svg className="w-5 h-5" viewBox="0 0 24 24">
+                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+              </svg>
+              Continue with Google
+            </button>
+
+            <p className="text-center text-sm text-gray-600 mt-6">
+              Need help?{' '}
+              <Link href="/contact" className="text-primary-600 hover:underline">
+                Contact the school office
+              </Link>
+            </p>
+          </motion.div>
         </div>
       </section>
 
