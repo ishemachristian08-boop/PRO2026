@@ -494,6 +494,67 @@ router.post('/security-code', protect, async (req, res) => {
   }
 });
 
+// @desc    Generate security code for a user (Admin only)
+// @route   POST /api/auth/admin/generate-security-code
+// @access  Private/Admin
+router.post('/admin/generate-security-code', protect, async (req, res) => {
+  try {
+    // Check if user is admin
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied. Admin privileges required.'
+      });
+    }
+
+    const { userId, generateNew } = req.body;
+
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: 'User ID is required'
+      });
+    }
+
+    const targetUser = await User.findById(userId);
+
+    if (!targetUser) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
+
+    let securityCode;
+    
+    if (generateNew) {
+      // Generate a random 6-digit code
+      securityCode = Math.floor(100000 + Math.random() * 900000).toString();
+      await targetUser.setSecurityCode(securityCode);
+      await targetUser.save();
+      
+      res.json({
+        success: true,
+        message: 'Security code generated successfully',
+        securityCode: securityCode // Return the plain code so admin can share it
+      });
+    } else {
+      // Just return whether user has a security code
+      res.json({
+        success: true,
+        hasSecurityCode: !!targetUser.securityCode
+      });
+    }
+
+  } catch (error) {
+    console.error('Generate security code error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error generating security code'
+    });
+  }
+});
+
 // @desc    Remove security code
 // @route   DELETE /api/auth/security-code
 // @access  Private

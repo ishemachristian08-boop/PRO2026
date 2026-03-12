@@ -63,12 +63,10 @@ export default function Home() {
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
-          <Image
+          <img
             src="/Front.png"
             alt="School Building"
-            fill
-            className="object-cover"
-            priority
+            className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-black/60" />
         </div>

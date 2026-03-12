@@ -150,7 +150,7 @@ export default function GalleryPage() {
               <h3 className="text-xl font-semibold text-gray-700 mb-2">No images yet</h3>
               <p className="text-gray-500 mb-6">Check back later for photos from our school.</p>
               <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 inline-block">
-                <p className="text-blue-800 font-medium">📸 School administrators can upload photos through the <a href="/admin" className="underline font-medium hover:text-blue-900">Admin Dashboard → Gallery</a>.</p>
+                <p className="text-blue-800 font-medium"> School administrators can upload photos through the <a href="/admin" className="underline font-medium hover:text-blue-900">ADMIN</a>.</p>
               </div>
             </div>
           ) : activeCategory === 'All' ? (

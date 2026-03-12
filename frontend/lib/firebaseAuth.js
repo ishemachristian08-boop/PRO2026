@@ -1,5 +1,27 @@
 // Firebase Authentication Service
-// Connects to Firebase Auth and Firestore for user roles
+// Admin emails list - emails that will be granted admin role
+const ADMIN_EMAILS = [
+  'ishemachristian08@gmail.com'
+];
+
+// Staff/Teacher emails list
+const STAFF_EMAILS = [
+  'ishemachristian08@gmail.com'
+];
+
+// Check if email is in admin list
+function isAdminEmail(email) {
+  return ADMIN_EMAILS.some(adminEmail => 
+    email.toLowerCase() === adminEmail.toLowerCase()
+  );
+}
+
+// Check if email is in staff list
+function isStaffEmail(email) {
+  return STAFF_EMAILS.some(staffEmail => 
+    email.toLowerCase() === staffEmail.toLowerCase()
+  ) || isAdminEmail(email);
+}
 import { 
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword,
@@ -8,29 +30,18 @@ import {
   signOut,
   onAuthStateChanged 
 } from 'firebase/auth';
-import { doc, setDoc, getDoc, getDocs, collection, serverTimestamp, query, where } from 'firebase/firestore';
+import { doc, setDoc, getDoc, getDocs, collection, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from './firebase';
 
 // Google Provider
 const googleProvider = new GoogleAuthProvider();
 
 // Get user role from Firestore
-async function getUserRoleFromFirestore(uid) {
+export async function getUserRole(uid) {
   try {
     const userDoc = await getDoc(doc(db, 'users', uid));
     if (userDoc.exists()) {
-      const data = userDoc.data();
-      // If role exists in Firestore, use it
-      if (data.role) {
-        return data.role;
-      }
-      // If email is in the document, check if it's admin
-      if (data.email) {
-        const adminEmails = ['admin@nca.rw', 'administrator@nca.rw'];
-        if (adminEmails.includes(data.email.toLowerCase())) {
-          return 'admin';
-        }
-      }
+      return userDoc.data().role || 'user';
     }
     return null;
   } catch (error) {
@@ -46,29 +57,36 @@ export async function loginWithEmail(email, password) {
     const user = result.user;
     
     // Get user role from Firestore
-    let role = await getUserRoleFromFirestore(user.uid);
+    let role = await getUserRole(user.uid);
     
-    // If no role in Firestore, check email for admin
+    // If no role in Firestore, check admin/staff email list
     if (!role) {
-      const adminEmails = ['admin@nca.rw', 'administrator@nca.rw'];
-      if (adminEmails.includes(email.toLowerCase())) {
+      if (isAdminEmail(user.email)) {
         role = 'admin';
-        // Save role to Firestore
+        // Create/update user record in Firestore
         await setDoc(doc(db, 'users', user.uid), {
           email: user.email,
-          displayName: user.displayName || email.split('@')[0],
+          name: user.displayName || 'Admin',
           role: 'admin',
-          lastLogin: serverTimestamp(),
+          createdAt: serverTimestamp(),
+          lastLogin: serverTimestamp()
+        }, { merge: true });
+      } else if (isStaffEmail(user.email)) {
+        role = 'teacher';
+        // Create/update user record in Firestore
+        await setDoc(doc(db, 'users', user.uid), {
+          email: user.email,
+          name: user.displayName || 'Teacher',
+          role: 'teacher',
+          createdAt: serverTimestamp(),
+          lastLogin: serverTimestamp()
         }, { merge: true });
       } else {
-        role = 'user';
-        // Save user to Firestore
-        await setDoc(doc(db, 'users', user.uid), {
-          email: user.email,
-          displayName: user.displayName || email.split('@')[0],
-          role: 'user',
-          lastLogin: serverTimestamp(),
-        }, { merge: true });
+        await signOut(auth);
+        return {
+          success: false,
+          message: 'Access denied. Your account is not registered in the system.'
+        };
       }
     }
     
@@ -97,24 +115,28 @@ export async function loginWithGoogle() {
     const result = await signInWithPopup(auth, googleProvider);
     const user = result.user;
     
-    // Get or create user role in Firestore
-    let role = await getUserRoleFromFirestore(user.uid);
+    // Get user role from Firestore
+    let role = await getUserRole(user.uid);
     
-    // If no role, check email for admin or create as user
+    // If no role in Firestore, check admin/staff email list
     if (!role) {
-      const adminEmails = ['admin@nca.rw', 'administrator@nca.rw'];
-      if (adminEmails.includes(user.email?.toLowerCase())) {
+      if (isAdminEmail(user.email)) {
         role = 'admin';
+      } else if (isStaffEmail(user.email)) {
+        role = 'teacher';
       } else {
-        role = 'user';
+        await signOut(auth);
+        return {
+          success: false,
+          message: 'Access denied. Your Google account is not registered in the system.'
+        };
       }
     }
     
-    // Save/update user in Firestore
+    // Update user in Firestore
     await setDoc(doc(db, 'users', user.uid), {
       email: user.email,
-      displayName: user.displayName,
-      photoURL: user.photoURL,
+      name: user.displayName || (role === 'admin' ? 'Admin' : 'Teacher'),
       role: role,
       lastLogin: serverTimestamp(),
     }, { merge: true });
@@ -138,43 +160,12 @@ export async function loginWithGoogle() {
   }
 }
 
-// Register with Email & Password
+// Register new user (disabled for admin - only Firestore admin can create users)
 export async function registerWithEmail(email, password, displayName) {
-  try {
-    const result = await createUserWithEmailAndPassword(auth, email, password);
-    const user = result.user;
-    
-    // Determine role based on email
-    const adminEmails = ['admin@nca.rw', 'administrator@nca.rw'];
-    const role = adminEmails.includes(email.toLowerCase()) ? 'admin' : 'user';
-    
-    // Save user to Firestore
-    await setDoc(doc(db, 'users', user.uid), {
-      email: user.email,
-      displayName: displayName || email.split('@')[0],
-      photoURL: null,
-      role: role,
-      createdAt: serverTimestamp(),
-      lastLogin: serverTimestamp(),
-    }, { merge: true });
-    
-    return {
-      success: true,
-      user: {
-        uid: user.uid,
-        email: user.email,
-        displayName: displayName || user.displayName,
-        photoURL: null,
-        role: role
-      }
-    };
-  } catch (error) {
-    console.error('Firebase register error:', error);
-    return {
-      success: false,
-      message: getErrorMessage(error.code)
-    };
-  }
+  return {
+    success: false,
+    message: 'User registration is disabled. Contact the administrator.'
+  };
 }
 
 // Logout
@@ -196,24 +187,14 @@ export function onAuthChange(callback) {
   return onAuthStateChanged(auth, async (user) => {
     if (user) {
       // Get role from Firestore
-      let role = await getUserRoleFromFirestore(user.uid);
-      
-      // Check email if no role found
-      if (!role) {
-        const adminEmails = ['admin@nca.rw', 'administrator@nca.rw'];
-        if (adminEmails.includes(user.email?.toLowerCase())) {
-          role = 'admin';
-        } else {
-          role = 'user';
-        }
-      }
+      const role = await getUserRole(user.uid);
       
       callback({
         uid: user.uid,
         email: user.email,
         displayName: user.displayName,
         photoURL: user.photoURL,
-        role: role,
+        role: role || 'user',
       });
     } else {
       callback(null);
@@ -221,36 +202,10 @@ export function onAuthChange(callback) {
   });
 }
 
-// Get all users (for admin management)
-export async function getAllUsers() {
-  try {
-    const usersSnapshot = await getDocs(collection(db, 'users'));
-    const users = [];
-    usersSnapshot.forEach((doc) => {
-      users.push({
-        id: doc.id,
-        ...doc.data()
-      });
-    });
-    return { success: true, users };
-  } catch (error) {
-    console.error('Error getting users:', error);
-    return { success: false, message: error.message, users: [] };
-  }
-}
-
-// Update user role (for admin)
-export async function updateUserRole(uid, newRole) {
-  try {
-    await setDoc(doc(db, 'users', uid), {
-      role: newRole,
-      updatedAt: serverTimestamp(),
-    }, { merge: true });
-    return { success: true };
-  } catch (error) {
-    console.error('Error updating user role:', error);
-    return { success: false, message: error.message };
-  }
+// Check if user is admin
+export async function checkAdminAccess(uid) {
+  const role = await getUserRole(uid);
+  return role === 'admin';
 }
 
 // Get error message
@@ -261,7 +216,7 @@ function getErrorMessage(code) {
     'auth/user-not-found': 'No account found with this email',
     'auth/wrong-password': 'Incorrect password',
     'auth/email-already-in-use': 'An account with this email already exists',
-    'auth/weak-password': 'Password should be at least 6 characters',
+    'auth/weak-password': 'Password must be at least 6 characters',
     'auth/popup-closed-by-user': 'Login was cancelled',
     'auth/account-exists-with-different-credential': 'An account already exists with a different sign-in method',
     'auth/network-request-failed': 'Network error. Please check your connection',

@@ -18,7 +18,8 @@ import {
   MagnifyingGlassIcon,
   FunnelIcon,
   CheckCircleIcon,
-  XCircleIcon
+  XCircleIcon,
+  KeyIcon
 } from '@heroicons/react/24/outline'
 
 export default function TeachersPage() {
@@ -29,6 +30,8 @@ export default function TeachersPage() {
   const [searchTerm, setSearchTerm] = useState('')
   const [departmentFilter, setDepartmentFilter] = useState('All')
   const [currentPage, setCurrentPage] = useState(1)
+  const [generatedCode, setGeneratedCode] = useState(null)
+  const [showCodeModal, setShowCodeModal] = useState(false)
 
   const departments = ['All', 'Nursery', 'Primary', 'Administration', 'Special Education']
 
@@ -76,6 +79,32 @@ export default function TeachersPage() {
     } catch (error) {
       console.error('Error deleting teacher:', error)
       setError('Failed to delete teacher')
+    }
+  }
+
+  const handleGenerateSecurityCode = async (teacherId) => {
+    try {
+      const token = localStorage.getItem('token')
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/auth/admin/generate-security-code`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ userId: teacherId, generateNew: true })
+      })
+      
+      const data = await response.json()
+      
+      if (data.success) {
+        setGeneratedCode({ code: data.securityCode, teacherId })
+        setShowCodeModal(true)
+      } else {
+        setError(data.message || 'Failed to generate security code')
+      }
+    } catch (error) {
+      console.error('Error generating security code:', error)
+      setError('Failed to generate security code')
     }
   }
 
@@ -286,6 +315,13 @@ export default function TeachersPage() {
                             </button>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                            <button
+                              onClick={() => handleGenerateSecurityCode(teacher._id)}
+                              className="text-green-600 hover:text-green-900"
+                              title="Generate Security Code"
+                            >
+                              <KeyIcon className="w-5 h-5" />
+                            </button>
                             <Link
                               href={`/admin/teachers/${teacher._id}`}
                               className="text-primary-600 hover:text-primary-900"
@@ -358,6 +394,33 @@ export default function TeachersPage() {
                     <PlusIcon className="w-5 h-5" />
                     <span>Add First Teacher</span>
                   </Link>
+                </div>
+              )}
+
+              {/* Security Code Modal */}
+              {showCodeModal && generatedCode && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                  <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+                    <div className="text-center">
+                      <div className="w-16 h-16 bg-green-100 rounded-full mx-auto mb-4 flex items-center justify-center">
+                        <KeyIcon className="w-8 h-8 text-green-600" />
+                      </div>
+                      <h3 className="text-xl font-bold text-gray-900 mb-2">Security Code Generated</h3>
+                      <p className="text-gray-600 mb-4">Share this code with the teacher for portal access:</p>
+                      <div className="bg-gray-100 rounded-lg p-4 mb-4">
+                        <p className="text-3xl font-mono font-bold text-center text-gray-900 tracking-wider">
+                          {generatedCode.code}
+                        </p>
+                      </div>
+                      <p className="text-sm text-yellow-600 mb-4">⚠️ This code will only be shown once!</p>
+                      <button
+                        onClick={() => { setShowCodeModal(false); setGeneratedCode(null); }}
+                        className="w-full bg-primary-500 text-white py-2 rounded-lg hover:bg-primary-600 transition-colors"
+                      >
+                        I have copied the code
+                      </button>
+                    </div>
+                  </div>
                 </div>
               )}
             </>

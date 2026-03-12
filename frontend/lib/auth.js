@@ -37,32 +37,12 @@ export function AuthProvider({ children }) {
 
   // Login function
   const login = async (email, password, securityCode = null) => {
-    // Demo mode: Set to false to use real backend, true for testing without backend
+    // Demo mode is disabled - using Firebase Authentication
     const DEMO_MODE = false
     
     if (DEMO_MODE) {
-      // Demo credentials for testing
-      const demoUsers = {
-        'admin@nca.rw': { id: '1', email: 'admin@nca.rw', role: 'admin', profile: { firstName: 'Admin', lastName: 'User' }, token: 'demo-token-admin' },
-        'teacher@nca.rw': { id: '2', email: 'teacher@nca.rw', role: 'teacher', profile: { firstName: 'John', lastName: 'Teacher' }, token: 'demo-token-teacher' },
-        'parent@nca.rw': { id: '3', email: 'parent@nca.rw', role: 'parent', profile: { firstName: 'Jane', lastName: 'Parent' }, token: 'demo-token-parent' },
-      }
-      
-      const user = demoUsers[email.toLowerCase()]
-      
-      // Accept both password123 and 01Jan08! for demo mode
-      if (user && (password === 'password123' || password === '01Jan08!')) {
-        // Check security code if required (for demo, accept any 4+ digit code or skip)
-        if (user.role === 'admin' && (!securityCode || securityCode.length < 4)) {
-          return { success: false, message: 'Security code is required for admin login', requiresSecurityCode: true }
-        }
-        
-        localStorage.setItem('token', user.token)
-        setUser(user)
-        return { success: true, data: user }
-      }
-      
-      return { success: false, message: 'Invalid credentials. Please check your email and password.' }
+      // Demo mode is disabled
+      return { success: false, message: 'Demo mode is disabled. Please use Firebase Authentication.' }
     }
     
     try {

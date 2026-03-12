@@ -1,7 +1,6 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import Image from 'next/image'
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
 
@@ -12,12 +11,10 @@ export default function AboutPage() {
 
       <section className="relative pt-32 pb-16 h-[500px] flex items-center">
         <div className="absolute inset-0 z-0">
-          <Image
+          <img
             src="/Front.png"
             alt="School Building"
-            fill
-            className="object-cover"
-            priority
+            className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-black/50" />
         </div>
